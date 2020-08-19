@@ -1,6 +1,6 @@
 # GKE CIS 1.1.0 Benchmark Inspec Profile
 
-This repository holds the [Google Kubernetes Engine (GKE)](https://cloud.google.com/) [Center for Internet Security (CIS)](https://www.cisecurity.org) [version 1.1 Benchmark](https://www.cisecurity.org/benchmark/kubernetes/) [Inspec](https://www.inspec.io/) Profile.
+This repository holds the [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) [Center for Internet Security (CIS)](https://www.cisecurity.org) [version 1.1 Benchmark](https://www.cisecurity.org/benchmark/kubernetes/) [Inspec](https://www.inspec.io/) Profile.
 
 ## Required Disclaimer
 
