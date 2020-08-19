@@ -3,7 +3,7 @@
 
 ## Let's get started!
 
-This guide will show you how to install InSpec on your Cloud Shell instance and how to use InSpec to check the infrastructure in your Google Cloud Project against the CIS GCP Benchmark.
+This guide will show you how to install InSpec on your Cloud Shell instance and how to use InSpec to check your Google Kubernetes Engine deployments against the CIS Benchmark.
 
 **Time to complete**: About 5 minutes
 
@@ -48,7 +48,7 @@ Hit Next after you successfully selected your project.
 
 ## Scan Your Project
 
-To scan your project against the CIS GCP Benchmark with InSpec, run:
+To scan your project against the CIS GKE Benchmark with InSpec, run:
 
 ```bash
 CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git -t gcp:// --input gcp_project_id={{project-id}}
