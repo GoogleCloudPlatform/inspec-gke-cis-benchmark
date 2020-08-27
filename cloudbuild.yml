@@ -20,11 +20,11 @@ timeout: 3000s
 steps:
 - id: 'Build Docker container'
   name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/${_GCP_PROJECT_ID}/inspec-gcp-cis-benchmark:${_PR_NUMBER}', '.' ]
+  args: [ 'build', '-t', 'gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}', '.' ]
 
 - id: 'Verify InSpec controls'
   waitFor: ['Build Docker container']
-  name: gcr.io/${_GCP_PROJECT_ID}/inspec-gcp-cis-benchmark:${_PR_NUMBER}
+  name: gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}
   entrypoint: '/bin/sh'
   args: 
     - '-c'
@@ -34,7 +34,7 @@ steps:
 
 - id: 'Rubocop'
   waitFor: ['Verify InSpec controls']
-  name: gcr.io/${_GCP_PROJECT_ID}/inspec-gcp-cis-benchmark:${_PR_NUMBER}
+  name: gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}
   entrypoint: '/bin/sh'
   args: 
     - '-c'
@@ -66,7 +66,7 @@ steps:
 
 - id: 'Run CIS Profile on in-scope project'
   waitFor: ['Write input file']
-  name: gcr.io/${_GCP_PROJECT_ID}/inspec-gcp-cis-benchmark:${_PR_NUMBER}
+  name: gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}
   entrypoint: '/bin/sh'
   args: 
     - '-c'
