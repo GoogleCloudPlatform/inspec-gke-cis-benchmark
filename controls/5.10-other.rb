@@ -87,7 +87,7 @@ else
 
     gke_clusters.each do |gke_cluster|
       describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
-        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
+        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name], beta: true) }
         # TODO: Inspec-GCP support
         its('pod_security_policy_config.enabled') { should cmp true }
       end
