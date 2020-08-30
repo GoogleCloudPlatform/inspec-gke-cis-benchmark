@@ -25,10 +25,10 @@ control "cis-gke-#{control_id}-#{control_abbrev}" do
 
   title "[#{control_abbrev.upcase}] Ensure Image Vulnerability Scanning using GCR Container Analysis or a third party provider"
 
-  desc 'Scan images	stored in	Google Container Registry (GCR) for	vulnerabilities.'
-  desc 'rationale', "Vulnerabilities in	software packages	can	be exploited by	hackers	or malicious	users	to	
-  obtain unauthorized	access to	local	cloud	resources. GCR Container Analysis	and	other	
-  third	party	products allow images	stored in	GCR	to be	scanned	for	known	vulnerabilities."
+  desc 'Scan images stored in Google Container Registry (GCR) for vulnerabilities.'
+  desc 'rationale', "Vulnerabilities in software packages can be exploited by hackers or malicious users to 
+  obtain unauthorized access to local cloud resources. GCR Container Analysis and other 
+  third party products allow images stored in GCR to be scanned for known vulnerabilities."
 
   tag cis_scored: true
   tag cis_level: 1
