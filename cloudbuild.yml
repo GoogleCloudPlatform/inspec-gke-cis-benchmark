@@ -17,11 +17,11 @@ substitutions:
   _REPORTS_BUCKET: ''
 
 timeout: 3000s
+images: ['gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}']
 steps:
 - id: 'Build Docker container'
   name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', 'gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}', '.' ]
-  images: ['gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}']
 
 - id: 'Verify InSpec controls'
   waitFor: ['Build Docker container']
