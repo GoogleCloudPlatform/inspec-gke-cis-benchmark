@@ -70,6 +70,8 @@ inputs:
   description: 'The allowed list of Storage Legacy Bucket Owners on Registry image bucket'
   type: array
   value:
+    - "projectEditor:pci-cis-good"
+    - "projectOwner:pci-cis-good"
     - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
     - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
 - name: registry_storage_legacy_bucket_writer_list
