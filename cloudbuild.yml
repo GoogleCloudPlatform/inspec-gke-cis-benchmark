@@ -49,7 +49,6 @@ steps:
   args: 
     - '-c'
     - |
-      cloud_build_service_account=`gcloud config get-value account`
       cat <<EOF > /workspace/inputs.yml
       gcp_project_id: "${_GCP_PROJECT_ID}"
       gcp_gke_locations:
