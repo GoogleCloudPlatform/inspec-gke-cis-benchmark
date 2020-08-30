@@ -26,8 +26,8 @@ control "cis-gke-#{control_id}-#{control_abbrev}" do
   title "[#{control_abbrev.upcase}] Ensure Image Vulnerability Scanning using GCR Container Analysis or a third party provider"
 
   desc 'Scan images stored in Google Container Registry (GCR) for vulnerabilities.'
-  desc 'rationale', "Vulnerabilities in software packages can be exploited by hackers or malicious users to 
-  obtain unauthorized access to local cloud resources. GCR Container Analysis and other 
+  desc 'rationale', "Vulnerabilities in software packages can be exploited by hackers or malicious users to
+  obtain unauthorized access to local cloud resources. GCR Container Analysis and other
   third party products allow images stored in GCR to be scanned for known vulnerabilities."
 
   tag cis_scored: true
@@ -39,8 +39,8 @@ control "cis-gke-#{control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/container-registry/docs/container-analysis'
 
-  describe "[#{gcp_project_id}]"  do
+  describe "[#{gcp_project_id}]" do
     subject { google_project_service(project: gcp_project_id, name: 'containerscanning.googleapis.com') }
-    its('state') { should cmp "ENABLED" }
+    its('state') { should cmp 'ENABLED' }
   end
 end
