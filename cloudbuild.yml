@@ -15,6 +15,7 @@
 substitutions:
   _GCP_PROJECT_ID: ''
   _REPORTS_BUCKET: ''
+  _REGISTRY_BUCKET_ADMIN: ''
 
 timeout: 3000s
 images: ['gcr.io/${_GCP_PROJECT_ID}/inspec-gke-cis-benchmark:${_PR_NUMBER}']
@@ -61,6 +62,12 @@ steps:
         - 'us-central1-d'
         - 'us-central1-e'
         - 'us-central1-f'
+      registry_storage_admin_list: ["user:${_REGISTRY_BUCKET_ADMIN}"]
+      registry_storage_object_admin_list: ["user:${_REGISTRY_BUCKET_ADMIN}"]
+      registry_storage_object_creator_list: ["user:${_REGISTRY_BUCKET_ADMIN}"]
+      registry_storage_legacy_bucket_owner_list: ["projectEditor:${_GCP_PROJECT_ID}", "projectOwner:${_GCP_PROJECT_ID}", "user:${_REGISTRY_BUCKET_ADMIN}"]
+      registry_storage_legacy_bucket_writer_list: ["user:${_REGISTRY_BUCKET_ADMIN}"]
+      registry_storage_legacy_object_owner_list: ["user:${_REGISTRY_BUCKET_ADMIN}"]
       EOF
       cat /workspace/inputs.yml
 
