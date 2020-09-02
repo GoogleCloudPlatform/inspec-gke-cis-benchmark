@@ -85,7 +85,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   # Check if storage bucket exists
   if google_storage_bucket(name: "artifacts.#{gcp_project_id}.appspot.com").name.nil?
     impact 'none'
-    describe "[#{gcp_project_id}] does not have a storage bucket for Google Container Registry Images, this test is Not Applicable.." do
+    describe "[#{gcp_project_id}] does not have a storage bucket for Google Container Registry Images, this test is Not Applicable." do
       skip "[#{gcp_project_id}] does not have a storage bucket for Google Container Registry Images."
     end
   else
