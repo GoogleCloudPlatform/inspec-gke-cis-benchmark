@@ -93,4 +93,32 @@ else
       end
     end
   end
+  # 5.10.5
+  sub_control_id = "#{control_id}.5"
+  control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+    impact 'medium'
+
+    title "[#{control_abbrev.upcase}] Ensure use of Binary Authorization"
+
+    desc 'Binary Authorization helps to protect supply-chain security by only allowing images with verifiable cryptographically signed metadata into the cluster.'
+    desc 'rationale', "Binary Authorization provides software supply-chain security for images that you deploy to GKE from Google Container Registry (GCR) or another container image registry.
+    Binary Authorization requires images to be signed by trusted authorities during the development process. These signatures are then validated at deployment time. By
+    enforcing validation, you can gain tighter control over your container environment by ensuring only verified images are integrated into the build-and-release process."
+
+    tag cis_scored: true
+    tag cis_level: 1
+    tag cis_gke: sub_control_id.to_s
+    tag cis_version: cis_version.to_s
+    tag project: gcp_project_id.to_s
+
+    ref 'CIS Benchmark', url: cis_url.to_s
+    ref 'GCP Docs', url: 'https://cloud.google.com/binary-authorization/'
+
+    gke_clusters.each do |gke_cluster|
+      describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
+        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
+        its('binary_authorization.enabled') { should cmp true }
+      end
+    end
+  end
 end
