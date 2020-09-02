@@ -48,9 +48,16 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/container-registry/docs/container-analysis'
 
-  describe "[#{gcp_project_id}]" do
-    subject { google_project_service(project: gcp_project_id, name: 'containerscanning.googleapis.com') }
-    its('state') { should cmp 'ENABLED' }
+  if google_project_service(project: gcp_project_id, name: 'containerregistry.googleapis.com')
+    impact 'none'
+    describe "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled." do
+      skip "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled."
+    end
+  else
+    describe "[#{gcp_project_id}]" do
+      subject { google_project_service(project: gcp_project_id, name: 'containerscanning.googleapis.com') }
+      its('state') { should cmp 'ENABLED' }
+    end
   end
 end
 
