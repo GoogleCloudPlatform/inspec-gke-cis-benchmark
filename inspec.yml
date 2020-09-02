@@ -48,3 +48,47 @@ inputs:
   type: array
   value:
     - ""
+- name: registry_storage_admin_list
+  description: 'The allowed list of Storage Admins on Registry image bucket'
+  type: array
+  value:
+    - ""
+#   - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
+#   - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
+- name: registry_storage_object_admin_list
+  description: 'The allowed list of Storage Object Admins on Registry image bucket'
+  type: array
+  value:
+    - ""
+#   - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
+#   - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
+- name: registry_storage_object_creator_list
+  description: 'The allowed list of Storage Object Creators on Registry image bucket'
+  type: array
+  value:
+    - ""
+#   - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
+#   - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
+- name: registry_storage_legacy_bucket_owner_list
+  description: 'The allowed list of Storage Legacy Bucket Owners on Registry image bucket'
+  type: array
+  value:
+    - ""
+#   - "projectEditor:pci-cis-good"
+#   - "projectOwner:pci-cis-good"
+#   - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
+#   - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
+- name: registry_storage_legacy_bucket_writer_list
+  description: 'The allowed list of Storage Legacy Bucket Writers on Registry image bucket'
+  type: array
+  value:
+    - ""
+#   - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
+#   - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
+- name: registry_storage_legacy_object_owner_list
+  description: 'The allowed list of Storage Legacy Object Owners on Registry image bucket'
+  type: array
+  value:
+    - ""
+#   - "serviceAccount:test1@myproject.iam.gserviceaccount.com"
+#   - "serviceAccount:test2@myproject.iam.gserviceaccount.com"
