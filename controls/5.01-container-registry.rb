@@ -48,7 +48,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/container-registry/docs/container-analysis'
 
-  if google_project_service(project: gcp_project_id, name: 'containerregistry.googleapis.com').state == "DISABLED"
+  if google_project_service(project: gcp_project_id, name: 'containerregistry.googleapis.com').state == 'DISABLED'
     impact 'none'
     describe "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled, this test is Not Applicable." do
       skip "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled."
