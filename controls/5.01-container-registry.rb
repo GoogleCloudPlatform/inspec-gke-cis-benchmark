@@ -48,9 +48,9 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/container-registry/docs/container-analysis'
 
-  if google_project_service(project: gcp_project_id, name: 'containerregistry.googleapis.com')
+  if google_project_service(project: gcp_project_id, name: 'containerregistry.googleapis.com').state == "DISABLED"
     impact 'none'
-    describe "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled." do
+    describe "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled, this test is Not Applicable." do
       skip "[#{gcp_project_id}] This project does not have the Google Container Registry Service enabled."
     end
   else
@@ -85,7 +85,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   # Check if storage bucket exists
   if google_storage_bucket(name: "artifacts.#{gcp_project_id}.appspot.com").name.nil?
     impact 'none'
-    describe "[#{gcp_project_id}] does not have a storage bucket for Google Container Registry Images." do
+    describe "[#{gcp_project_id}] does not have a storage bucket for Google Container Registry Images, this test is Not Applicable.." do
       skip "[#{gcp_project_id}] does not have a storage bucket for Google Container Registry Images."
     end
   else
