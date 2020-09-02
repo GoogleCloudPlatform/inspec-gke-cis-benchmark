@@ -93,7 +93,7 @@ else
       end
     end
   end
-  #5.10.5
+  # 5.10.5
   sub_control_id = "#{control_id}.5"
   control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     impact 'medium'
@@ -116,7 +116,7 @@ else
 
     gke_clusters.each do |gke_cluster|
       describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
-        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name])}
+        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
         # TODO: Inspec-GCP support
         its('binary_authorization.enabled') { should cmp true }
       end
