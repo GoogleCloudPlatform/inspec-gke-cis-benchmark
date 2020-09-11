@@ -35,7 +35,7 @@ $ gem install inspec-bin --no-document --quiet
 $ gcloud auth list
 
 # acquire credentials to use with Application Default Credentials
-$ gcloud auth application-default login 
+$ gcloud auth application-default login
 
 ```
 
@@ -46,3 +46,15 @@ $ CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatf
 Profile Summary: 48 successful controls, 5 control failures, 7 controls skipped
 Test Summary: 166 successful, 7 failures, 7 skipped
 ```
+
+### Required Permissions
+
+The following permissions are required to run the CIS benchmark profile on project level:
+
+* compute.regions.list
+* compute.zones.list
+* container.clusters.get
+* container.clusters.list
+* serviceusage.services.get
+* storage.buckets.get
+* storage.buckets.getIamPolicy
