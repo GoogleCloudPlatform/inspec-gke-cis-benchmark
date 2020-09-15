@@ -180,3 +180,34 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     end
   end
 end
+
+# 5.1.4
+sub_control_id = "#{control_id}.4"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Minimize Container Registries to only those approved"
+
+  desc 'Use Binary Authorization to allowlist (whitelist) only approved container registries.'
+  desc 'rationale', "Allowing unrestricted access to external container registries provides the opportunity for
+  malicious or unapproved containers to be deployed into the cluster. Allowlisting only
+  approved container registries reduces this risk.
+  See also Recommendation 6.10.5."
+
+  tag cis_scored: false
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://cloud.google.com/binary-authorization/'
+
+  gke_clusters.each do |gke_cluster|
+    describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
+      subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
+      its('binary_authorization.enabled') { should cmp true }
+      # TODO: Implement check for "Allow all policy" (currently no method available with inspec-gcp)
+    end
+  end
+end
