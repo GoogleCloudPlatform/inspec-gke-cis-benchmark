@@ -19,7 +19,7 @@ gcp_gke_locations = input('gcp_gke_locations')
 cis_version = input('cis_version')
 cis_url = input('cis_url')
 control_id = '5.4'
-control_abbrev = 'node'
+control_abbrev = 'node-metadata'
 
 gke_clusters = GKECache(project: gcp_project_id, gke_locations: gcp_gke_locations).gke_clusters_cache
 
@@ -60,6 +60,7 @@ else
 
     ref 'CIS Benchmark', url: cis_url.to_s
     ref 'GCP Docs', url: 'https://cloud.google.com/kubernetes-engine/docs/how-to/protecting-cluster-metadata#disable-legacy-apis'
+
     gke_clusters.each do |gke_cluster|
       google_container_node_pools(project: gcp_project_id, location: gke_cluster[:location], cluster_name: gke_cluster[:cluster_name]).node_pool_names.each do |nodepoolname|
         nodepool = google_container_node_pool(project: gcp_project_id, location: gke_cluster[:location], cluster_name: gke_cluster[:cluster_name], nodepool_name: nodepoolname)
