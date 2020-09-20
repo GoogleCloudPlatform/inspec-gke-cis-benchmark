@@ -17,8 +17,9 @@ This is an initial release, mainly consisting of ported controls from the CIS fo
 This profile uses InSpec Inputs to make the tests more flexible. You are able to provide inputs at runtime either via the `cli` or via `YAML files` to help the profile work best in your deployment.
 
 **pro tip**: Do not change the inputs in the `inspec.yml` file directly, either:
-a. update them via the cli
-b. pass them in via a YAML file as shown in the `Example'
+
+1. update them via the cli - via the `--input` flag
+2. pass them in via a YAML file as shown in the `Example` - via the `--input-file` flag
 
 Further details can be found here: <https://docs.chef.io/inspec/inputs/>
 
