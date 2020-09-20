@@ -14,8 +14,7 @@ This is an initial release, mainly consisting of ported controls from the CIS fo
 
 ### Profile Inputs
 
-* **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
-
+- **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
 
 ### Cloud Shell Walkthrough
 
@@ -41,7 +40,7 @@ $ gcloud auth application-default login
 
 ```
 # scan a project with this profile, replace <YOUR_PROJECT_ID> with your project ID
-$ CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git -t gcp:// --input gcp_project_id=<YOUR_PROJECT_ID>
+$ CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git -t gcp:// --input gcp_project_id=<YOUR_PROJECT_ID> --reporter cli json:myscan.json
 ...snip...
 Profile Summary: 48 successful controls, 5 control failures, 7 controls skipped
 Test Summary: 166 successful, 7 failures, 7 skipped
@@ -51,10 +50,10 @@ Test Summary: 166 successful, 7 failures, 7 skipped
 
 The following permissions are required to run the CIS benchmark profile on project level:
 
-* compute.regions.list
-* compute.zones.list
-* container.clusters.get
-* container.clusters.list
-* serviceusage.services.get
-* storage.buckets.get
-* storage.buckets.getIamPolicy
+- compute.regions.list
+- compute.zones.list
+- container.clusters.get
+- container.clusters.list
+- serviceusage.services.get
+- storage.buckets.get
+- storage.buckets.getIamPolicy
