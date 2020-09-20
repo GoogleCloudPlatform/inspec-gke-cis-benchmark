@@ -12,10 +12,18 @@ This is an initial release, mainly consisting of ported controls from the CIS fo
 
 ## Usage
 
-### Profile Inputs
+### Profile Inputs (see `inspec.yml` file)
 
-* **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
+This profile uses InSpec Inputs to make the tests more flexible. You are able to provide inputs at runtime either via the `cli` or via `YAML files` to help the profile work best in your deployment.
 
+**pro tip**: Do not change the inputs in the `inspec.yml` file directly, either:
+
+1. update them via the cli - via the `--input` flag
+2. pass them in via a YAML file as shown in the `Example` - via the `--input-file` flag
+
+Further details can be found here: <https://docs.chef.io/inspec/inputs/>
+
+- **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
 
 ### Cloud Shell Walkthrough
 
@@ -41,7 +49,7 @@ $ gcloud auth application-default login
 
 ```
 # scan a project with this profile, replace <YOUR_PROJECT_ID> with your project ID
-$ CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git -t gcp:// --input gcp_project_id=<YOUR_PROJECT_ID>
+$ CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git -t gcp:// --input gcp_project_id=<YOUR_PROJECT_ID> --reporter cli json:myscan.json
 ...snip...
 Profile Summary: 48 successful controls, 5 control failures, 7 controls skipped
 Test Summary: 166 successful, 7 failures, 7 skipped
@@ -51,10 +59,10 @@ Test Summary: 166 successful, 7 failures, 7 skipped
 
 The following permissions are required to run the CIS benchmark profile on project level:
 
-* compute.regions.list
-* compute.zones.list
-* container.clusters.get
-* container.clusters.list
-* serviceusage.services.get
-* storage.buckets.get
-* storage.buckets.getIamPolicy
+- compute.regions.list
+- compute.zones.list
+- container.clusters.get
+- container.clusters.list
+- serviceusage.services.get
+- storage.buckets.get
+- storage.buckets.getIamPolicy
