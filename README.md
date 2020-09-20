@@ -12,7 +12,15 @@ This is an initial release, mainly consisting of ported controls from the CIS fo
 
 ## Usage
 
-### Profile Inputs
+### Profile Inputs (see `inspec.yml` file)
+
+This profile uses InSpec Inputs to make the tests more flexible. You are able to provide inputs at runtime either via the `cli` or via `YAML files` to help the profile work best in your deployment.
+
+**pro tip**: Do not change the inputs in the `inspec.yml` file directly, either:
+a. update them via the cli
+b. pass them in via a YAML file as shown in the `Example'
+
+Further details can be found here: <https://docs.chef.io/inspec/inputs/>
 
 - **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
 
