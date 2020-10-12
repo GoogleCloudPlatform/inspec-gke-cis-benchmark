@@ -113,3 +113,50 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     end
   end
 end
+
+# 4.2.3
+sub_control_id = "#{control_id}.3"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Minimize the admission of containers wishing to share the host
+  IPC namespace"
+
+  desc 'Do not generally permit containers to be run with the hostIPC flag set to true.'
+  desc 'rationale', "A container running in the host's IPC namespace can use IPC to interact with processes
+  outside the container.
+  There should be at least one PodSecurityPolicy (PSP) defined which does not permit
+  containers to share the host IPC namespace.
+  If you have a requirement to containers which require hostIPC, this should be defined in a
+  separate PSP and you should carefully check RBAC controls to ensure that only limited
+  service accounts and users are given permission to access that PSP."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/concepts/policy/pod-security-policy'
+
+  pod_security_policies = k8sobjects(api: 'extensions/v1beta1', type: 'podsecuritypolicies').items
+  if pod_security_policies.count.zero?
+    impact 'none'
+    describe 'GKE Cluster does not have any PodSecurityPolicies, this test is Not Applicable.' do
+      skip 'GKE Cluster does not have any PodSecurityPolicies.'
+    end
+  else
+    has_host_ipc_disabled = false
+    pod_security_policies.each do |pod_security_policy_item|
+      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      has_host_ipc_disabled = true if pod_security_policy.item.spec.hostIPC != true
+    end
+    describe "[#{gcp_project_id}] Pod Security Policies" do
+      subject { has_host_ipc_disabled }
+      it 'have a policy with hostIPC not enabled' do
+        expect(subject).to be true
+      end
+    end
+  end
+end
