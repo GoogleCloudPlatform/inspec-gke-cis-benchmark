@@ -311,3 +311,104 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     end
   end
 end
+
+# 4.2.7
+sub_control_id = "#{control_id}.7"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Minimize the admission of containers with the NET_RAW
+  capability"
+
+  desc 'Do not generally permit containers with the potentially dangerous NET_RAW capability.'
+  desc 'rationale', "Containers run with a default set of capabilities as assigned by the Container Runtime. By
+  default this can include potentially dangerous capabilities. With Docker as the container
+  runtime the NET_RAW capability is enabled which may be misused by malicious
+  containers.
+  Ideally, all containers should drop this capability.
+  There should be at least one PodSecurityPolicy (PSP) defined which prevents containers
+  with the NET_RAW capability from launching.
+  If you need to run containers with this capability, this should be defined in a separate PSP
+  and you should carefully check RBAC controls to ensure that only limited service accounts
+  and users are given permission to access that PSP."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://www.nccgroup.trust/uk/our-research/abusing-privileged-and-unprivileged-linux-containers/'
+
+  if pod_security_policies.count.zero?
+    impact 'none'
+    describe 'GKE Cluster does not have any PodSecurityPolicies, this test is Not Applicable.' do
+      skip 'GKE Cluster does not have any PodSecurityPolicies.'
+    end
+  else
+    has_req_capabilities_dropped = false
+    pod_security_policies.each do |pod_security_policy_item|
+      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      next if pod_security_policy.item.spec.requiredDropCapabilities.nil?
+      has_req_capabilities_dropped = true if pod_security_policy.item.spec.requiredDropCapabilities.include? 'ALL'
+      has_req_capabilities_dropped = true if pod_security_policy.item.spec.requiredDropCapabilities.include? 'NET_RAW'
+    end
+    describe "[#{gcp_project_id}] Pod Security Policies" do
+      subject { has_req_capabilities_dropped }
+      it 'have a policy with requiredCropCapabilities to include either ALL or NET_RAW' do
+        expect(subject).to be true
+      end
+    end
+  end
+end
+
+# 4.2.8
+sub_control_id = "#{control_id}.8"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Minimize the admission of containers with added capabilities"
+
+  desc 'Do not generally permit containers with capabilities assigned beyond the default set.'
+  desc 'rationale', "Containers run with a default set of capabilities as assigned by the Container Runtime.
+  Capabilities outside this set can be added to containers which could expose them to risks of
+  container breakout attacks.
+  There should be at least one PodSecurityPolicy (PSP) defined which prevents containers
+  with capabilities beyond the default set from launching.
+  If you need to run containers with additional capabilities, this should be defined in a
+  separate PSP and you should carefully check RBAC controls to ensure that only limited
+  service accounts and users are given permission to access that PSP."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://www.nccgroup.trust/uk/our-research/abusing-privileged-and-unprivileged-linux-containers/'
+
+  if pod_security_policies.count.zero?
+    impact 'none'
+    describe 'GKE Cluster does not have any PodSecurityPolicies, this test is Not Applicable.' do
+      skip 'GKE Cluster does not have any PodSecurityPolicies.'
+    end
+  else
+    has_added_capabilities = false
+    pod_security_policies.each do |pod_security_policy_item|
+      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      next if pod_security_policy.item.spec.allowedCapabilities.nil?
+      if pod_security_policy.item.spec.allowedCapabilities.count.positive?
+        has_added_capabilities = true
+        break
+      end
+    end
+    describe "[#{gcp_project_id}] Pod Security Policies" do
+      subject { has_added_capabilities }
+      it 'not have a policy which has non-empty allowedCapabilities' do
+        expect(subject).to be false
+      end
+    end
+  end
+end
