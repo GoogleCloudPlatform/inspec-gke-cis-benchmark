@@ -356,7 +356,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     end
     describe "[#{gcp_project_id}] Pod Security Policies" do
       subject { has_req_capabilities_dropped }
-      it 'have a policy with requiredCropCapabilities to include either ALL or NET_RAW' do
+      it 'have a policy with requiredDropCapabilities to include either ALL or NET_RAW' do
         expect(subject).to be true
       end
     end
@@ -409,6 +409,42 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
       it 'not have a policy which has non-empty allowedCapabilities' do
         expect(subject).to be false
       end
+    end
+  end
+end
+
+# 4.2.9
+sub_control_id = "#{control_id}.9"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Minimize the admission of containers with capabilities assigned"
+
+  desc 'Do not generally permit containers with capabilities.'
+  desc 'rationale', "Containers run with a default set of capabilities as assigned by the Container Runtime.
+  Capabilities are parts of the rights generally granted on a Linux system to the root user.
+  In many cases applications running in containers do not require any capabilities to operate,
+  so from the perspective of the principal of least privilege use of capabilities should be
+  minimized."
+
+  tag cis_scored: false
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://www.nccgroup.trust/uk/our-research/abusing-privileged-and-unprivileged-linux-containers/'
+
+  if pod_security_policies.count.zero?
+    impact 'none'
+    describe 'GKE Cluster does not have any PodSecurityPolicies, this test is Not Applicable.' do
+      skip 'GKE Cluster does not have any PodSecurityPolicies.'
+    end
+  else
+    impact 'none'
+    describe 'For each PSP, check whether capabilities have been forbidden. This test needs to be performed manually.' do
+      skip 'This test needs to be performed manually.'
     end
   end
 end
