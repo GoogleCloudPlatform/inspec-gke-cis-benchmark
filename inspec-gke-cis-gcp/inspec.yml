@@ -21,10 +21,10 @@ license: Apache-2.0
 summary: "Inspec Google Kubernetes Engine Center for Internet Security Benchmark v1.1 Profile"
 version: "0.1.0"
 supports:
-  - platform: gcp
+- platform: gcp
 depends:
-  - name: inspec-gcp-helpers
-    url: https://github.com/GoogleCloudPlatform/inspec-gcp-helpers/archive/v1.0.7.tar.gz
+- name: inspec-gcp-helpers
+  url: https://github.com/GoogleCloudPlatform/inspec-gcp-helpers/archive/v1.0.7.tar.gz
 inputs:
 - name: gcp_project_id
   description: 'The GCP project identifier.'

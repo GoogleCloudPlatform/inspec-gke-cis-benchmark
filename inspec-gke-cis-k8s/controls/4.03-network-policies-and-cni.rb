@@ -47,7 +47,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   namespaces = []
   k8sobjects(api: 'v1', type: 'namespaces').items.each do |namespace_k8s|
-    namespaces.push(namespace_k8s.name) unless ["kube-node-lease", "kube-public", "kube-system"].include?(namespace_k8s.name) 
+    namespaces.push(namespace_k8s.name) unless %w[kube-node-lease kube-public kube-system].include?(namespace_k8s.name)
   end
 
   has_network_policy = true
@@ -57,7 +57,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
       break
     end
   end
-  
+
   describe "[#{gcp_project_id}] Network Policies" do
     subject { has_network_policy }
     it 'exist for each Namespace in the cluster' do
