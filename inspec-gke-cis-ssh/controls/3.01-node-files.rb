@@ -79,8 +79,11 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kube-proxy/'
 
-  describe "[#{gcp_project_id}] File /var/lib/kube-proxy/kubeconfig" do
-    subject { file('/var/lib/kube-proxy/kubeconfig') }
+  c = command('ps -ef | grep kube-proxy | grep -e "--kubeconfig=" | sed "s/^.*\(--kubeconfig=.* \).*$/\1/" | awk \'{print $1}\'').stdout.split('=')
+  kube_proxy_config_file_path = c[1].split("\n").first
+
+  describe "[#{gcp_project_id}] Kube-proxy config file #{kube_proxy_config_file_path}" do
+    subject { file(kube_proxy_config_file_path) }
     its('owner') { should cmp 'root' }
     its('group') { should cmp 'root' }
   end
@@ -110,7 +113,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/'
 
-  kubelet_config_file_path = c = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
   file_permissions = command("stat -c %a #{kubelet_config_file_path}").stdout.to_i
 
   describe "[#{gcp_project_id}] File permissions of kubelet config file #{kubelet_config_file_path}" do
@@ -118,6 +121,38 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     it 'should be 644 or more restrictive' do
       expect(subject).to be_in [644, 640, 600, 400, 444, 440]
     end
+  end
+
+end
+
+# 3.1.4
+sub_control_id = "#{control_id}.4"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the kubelet configuration file ownership is set to root:root"
+
+  desc 'Ensure that if the kubelet refers to a configuration file with the --config argument, that file
+  is owned by root:root.'
+  desc 'rationale', "The kubelet reads various parameters, including security settings, from a config file
+  specified by the --config argument. If this file is specified you should restrict its file
+  permissions to maintain the integrity of the file. The file should be owned by root:root."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/'
+
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { file(kubelet_config_file_path) }
+    its('owner') { should cmp 'root' }
+    its('group') { should cmp 'root' }
   end
 
 end
