@@ -43,12 +43,15 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kube-proxy/'
 
-  file_permissions = command('stat -c %a /var/lib/kube-proxy/kubeconfig').stdout.to_i
+  c = command('ps -ef | grep kube-proxy | grep -e "--kubeconfig=" | sed "s/^.*\(--kubeconfig=.* \).*$/\1/" | awk \'{print $1}\'').stdout.split('=')
+  kube_proxy_config_file_path = c[1].split("\n").first
+  
+  file_permissions = command("stat -c %a #{kube_proxy_config_file_path}").stdout.to_i
 
-  describe "[#{gcp_project_id}] File permissions of /var/lib/kube-proxy/kubeconfig" do
+  describe "[#{gcp_project_id}] File permissions of kube-proxy config file #{kube_proxy_config_file_path}" do
     subject { file_permissions }
-    it 'should be 644' do
-      expect(subject).to eq(644)
+    it 'should be 644 or more restrictive' do
+      expect(subject).to be_in [644, 640, 600, 400, 444, 440]
     end
   end
 
@@ -59,7 +62,7 @@ sub_control_id = "#{control_id}.2"
 control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   impact 'medium'
 
-  title "[#{control_abbrev.upcase}] EEnsure that the proxy kubeconfig file ownership is set to root:root"
+  title "[#{control_abbrev.upcase}] Ensure that the proxy kubeconfig file ownership is set to root:root"
 
   desc 'If kube-proxy is running, ensure that the file ownership of its kubeconfig file is set to
   root:root.'
@@ -80,6 +83,41 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { file('/var/lib/kube-proxy/kubeconfig') }
     its('owner') { should cmp 'root' }
     its('group') { should cmp 'root' }
+  end
+
+end
+
+# 3.1.3
+sub_control_id = "#{control_id}.3"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the kubelet configuration file has permissions set to
+  644 or more restrictive"
+
+  desc 'If kube-proxy is running, ensure that the file ownership of its kubeconfig file is set to
+  root:root.'
+  desc 'rationale', "The kubeconfig file for kube-proxy controls various parameters for the kube-proxy service
+  in the worker node. You should set its file ownership to maintain the integrity of the file.
+  The file should be owned by root:root."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/'
+
+  kubelet_config_file_path = c = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  file_permissions = command("stat -c %a #{kubelet_config_file_path}").stdout.to_i
+
+  describe "[#{gcp_project_id}] File permissions of kubelet config file #{kubelet_config_file_path}" do
+    subject { file_permissions }
+    it 'should be 644 or more restrictive' do
+      expect(subject).to be_in [644, 640, 600, 400, 444, 440]
+    end
   end
 
 end
