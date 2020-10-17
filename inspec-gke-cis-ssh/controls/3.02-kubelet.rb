@@ -51,3 +51,37 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   end
 
 end
+
+# 3.2.2
+sub_control_id = "#{control_id}.2"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --authorization-mode argument is not set to AlwaysAllow"
+
+  desc 'Do not allow all requests. Enable explicit authorization.'
+  desc 'rationale', "Kubelets, by default, allow all authenticated requests (even anonymous ones) without
+  needing explicit authorization checks from the apiserver. You should restrict this behavior
+  and only allow explicitly authorized requests."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
+
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  kubelet_config_file = yaml(kubelet_config_file_path)
+  authorization_mode_config = kubelet_config_file.authorization["mode"]
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { authorization_mode_config }
+    it 'should not have authorization mode set to AlwaysAllow' do
+      expect(subject).not_to cmp "AlwaysAllow"
+    end
+  end
+
+end
