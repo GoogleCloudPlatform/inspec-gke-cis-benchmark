@@ -156,3 +156,33 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   end
 
 end
+
+# 3.2.5
+sub_control_id = "#{control_id}.5"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --streaming-connection-idle-timeout argument is not set to 0"
+
+  desc 'Do not disable timeouts on streaming connections.'
+  desc 'rationale', "Setting idle timeouts ensures that you are protected against Denial-of-Service attacks,
+  inactive connections and running out of ephemeral ports."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://github.com/kubernetes/kubernetes/pull/18552'
+
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  kubelet_config_file = yaml(kubelet_config_file_path)
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('streamingConnectionIdleTimeout') { should_not eq 0 }
+  end
+
+end
