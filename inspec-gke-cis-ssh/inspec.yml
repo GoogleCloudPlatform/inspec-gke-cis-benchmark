@@ -33,3 +33,7 @@ inputs:
   description: 'The URL to the GKE CIS Benchmark'
   value: 'https://www.cisecurity.org/benchmark/kubernetes/'
   type: string
+- name: client_ca_file_path
+  description: 'Path to the client ca file used in Kubelet config'
+  value: '/etc/srv/kubernetes/pki/ca-certificates.crt'
+  type: string

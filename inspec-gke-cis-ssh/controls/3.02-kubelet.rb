@@ -18,6 +18,8 @@ cis_url = input('cis_url')
 control_id = '3.2'
 control_abbrev = 'kubelet'
 
+client_ca_file_path = input('client_ca_file_path')
+
 # 3.2.1
 sub_control_id = "#{control_id}.1"
 control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
@@ -81,6 +83,44 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { authorization_mode_config }
     it 'should not have authorization mode set to AlwaysAllow' do
       expect(subject).not_to cmp "AlwaysAllow"
+    end
+  end
+
+end
+
+# 3.2.3
+sub_control_id = "#{control_id}.3"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --client-ca-file argument is set as appropriate"
+
+  desc 'Enable Kubelet authentication using certificates.'
+  desc 'rationale', "The connections from the apiserver to the kubelet are used for fetching logs for pods,
+  attaching (through kubectl) to running pods, and using the kubelet’s port-forwarding
+  functionality. These connections terminate at the kubelet’s HTTPS endpoint. By default, the
+  apiserver does not verify the kubelet’s serving certificate, which makes the connection
+  subject to man-in-the-middle attacks, and unsafe to run over untrusted and/or public
+  networks. Enabling Kubelet certificate authentication ensures that the apiserver could
+  authenticate the Kubelet before submitting any requests."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
+
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  kubelet_config_file = yaml(kubelet_config_file_path)
+  client_ca_file = kubelet_config_file.authentication["x509"]["clientCAFile"]
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { client_ca_file }
+    it 'should be have certificate authentication enabled' do
+      expect(subject).to cmp client_ca_file_path
     end
   end
 
