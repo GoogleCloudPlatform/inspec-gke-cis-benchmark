@@ -125,3 +125,34 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   end
 
 end
+
+# 3.2.4
+sub_control_id = "#{control_id}.4"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --read-only-port argument is set to 0"
+
+  desc 'Disable the read-only port.'
+  desc 'rationale', "The Kubelet process provides a read-only API in addition to the main Kubelet API.
+  Unauthenticated access is provided to this read-only API which could possibly retrieve
+  potentially sensitive information about the cluster."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kubelet/'
+
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  kubelet_config_file = yaml(kubelet_config_file_path)
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('readOnlyPort') { should cmp 0 }
+  end
+
+end
