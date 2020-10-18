@@ -186,3 +186,36 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   end
 
 end
+
+# 3.2.6
+sub_control_id = "#{control_id}.6"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --protect-kernel-defaults argument is set to true"
+
+  desc 'Protect tuned kernel parameters from overriding kubelet default kernel parameter values.'
+  desc 'rationale', "Kernel parameters are usually tuned and hardened by the system administrators before
+  putting the systems into production. These parameters protect the kernel and the system.
+  Your kubelet kernel defaults that rely on such parameters should be appropriately set to
+  match the desired secured system state. Ignoring this could potentially lead to running
+  pods with undesired kernel behavior."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/'
+
+  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+  kubelet_config_file = yaml(kubelet_config_file_path)
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('protectKernelDefaults') { should cmp 'true' }
+  end
+
+end
