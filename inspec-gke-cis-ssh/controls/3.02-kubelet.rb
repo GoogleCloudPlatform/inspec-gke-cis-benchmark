@@ -304,7 +304,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 end
 
 # 3.2.10
-sub_control_id = "#{control_id}.9"
+sub_control_id = "#{control_id}.10"
 control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   impact 'medium'
 
@@ -328,6 +328,35 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { yaml(kubelet_config_file_path) }
     its('tlsCertFile') { should cmp tls_cert_file }
     its('tlsPrivateKeyFile') { should cmp tls_private_key_file }
+  end
+
+end
+
+# 3.2.11
+sub_control_id = "#{control_id}.11"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --rotate-certificates argument is not set to false"
+
+  desc 'Enable kubelet client certificate rotation.'
+  desc 'rationale', "The --rotate-certificates setting causes the kubelet to rotate its client certificates by
+  creating new CSRs as its existing credentials expire. This automated periodic rotation
+  ensures that the there is no downtime due to expired certificates and thus addressing
+  availability in the CIA security triad."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration'
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('rotateCertificates') { should_not cmp "false" }
   end
 
 end
