@@ -20,6 +20,9 @@ control_abbrev = 'kubelet'
 
 client_ca_file_path = input('client_ca_file_path')
 
+kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+kubelet_config_file = yaml(kubelet_config_file_path)
+
 # 3.2.1
 sub_control_id = "#{control_id}.1"
 control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
@@ -41,8 +44,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
 
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-  kubelet_config_file = yaml(kubelet_config_file_path)
   anonymous_auth_config = kubelet_config_file.authentication["anonymous"]["enabled"]
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
@@ -75,8 +76,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
 
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-  kubelet_config_file = yaml(kubelet_config_file_path)
   authorization_mode_config = kubelet_config_file.authorization["mode"]
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
@@ -113,8 +112,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
 
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-  kubelet_config_file = yaml(kubelet_config_file_path)
   client_ca_file = kubelet_config_file.authentication["x509"]["clientCAFile"]
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
@@ -147,9 +144,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kubelet/'
 
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-  kubelet_config_file = yaml(kubelet_config_file_path)
-
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { yaml(kubelet_config_file_path) }
     its('readOnlyPort') { should cmp 0 }
@@ -176,9 +170,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://github.com/kubernetes/kubernetes/pull/18552'
-
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-  kubelet_config_file = yaml(kubelet_config_file_path)
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { yaml(kubelet_config_file_path) }
@@ -210,12 +201,40 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/'
 
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-  kubelet_config_file = yaml(kubelet_config_file_path)
-
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { yaml(kubelet_config_file_path) }
     its('protectKernelDefaults') { should cmp 'true' }
+  end
+
+end
+
+# 3.2.7
+sub_control_id = "#{control_id}.7"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --make-iptables-util-chains argument is set to true"
+
+  desc 'Allow Kubelet to manage iptables.'
+  desc 'rationale', "Kubelets can automatically manage the required changes to iptables based on how you
+  choose your networking options for the pods. It is recommended to let kubelets manage
+  the changes to iptables. This ensures that the iptables configuration remains in sync with
+  pods networking configuration. Manually configuring iptables with dynamic pod network
+  configuration changes might hamper the communication between pods/containers and to
+  the outside world. You might have iptables rules too restrictive or too open."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/'
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('makeIPTablesUtilChains') { should_not cmp 'false' }
   end
 
 end
