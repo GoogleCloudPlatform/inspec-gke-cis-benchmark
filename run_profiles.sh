@@ -26,8 +26,8 @@ usage() {
 	echo "  -c cluster_name         Name of the GKE cluster which will be scanned (required)"
 	echo "  -u username             User which logs in to cluster nodes (required). This user requires root privileges on cluster nodes."
 	echo "  -k keyfile              Path to SSH Keyfile required for user to log in to cluster nodes. (required)"
-	echo "  -z zone                 Region of regional GKE cluster. Provide either zone or region."
-  echo "  -r region               Zone of zonal GKE cluster. Provide either zone or region."
+	echo "  -z zone                 Zone of zonal GKE cluster. Provide either zone or region."
+  echo "  -r region               Region of regional GKE cluster. Provide either zone or region."
 }
 
 main() {
