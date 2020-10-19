@@ -20,6 +20,8 @@ control_abbrev = 'kubelet'
 
 client_ca_file_path = input('client_ca_file_path')
 event_record_qps = input('event_record_qps')
+tls_cert_file = input('tls_cert_file')
+tls_private_key_file = input('tls_private_key_file')
 
 kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
 kubelet_config_file = yaml(kubelet_config_file_path)
@@ -297,6 +299,35 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { yaml(kubelet_config_file_path) }
     its('eventRecordQPS') { should cmp event_record_qps }
+  end
+
+end
+
+# 3.2.10
+sub_control_id = "#{control_id}.9"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --tls-cert-file and --tls-private-key-file arguments
+  are set as appropriate"
+
+  desc 'Setup TLS connection on the Kubelets.'
+  desc 'rationale', "Kubelet communication contains sensitive parameters that should remain encrypted in
+  transit. Configure the Kubelets to serve only HTTPS traffic."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'http://rootsquash.com/2016/05/10/securing-the-kubernetes-api/'
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('tlsCertFile') { should cmp tls_cert_file }
+    its('tlsPrivateKeyFile') { should cmp tls_private_key_file }
   end
 
 end

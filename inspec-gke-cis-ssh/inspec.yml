@@ -41,3 +41,11 @@ inputs:
   description: '--event-qps flag of Kubelet config (see control 3.2.9)'
   value: "0"
   type: string
+- name: tls_cert_file
+  description: 'Location of the certificate file to use to identify the Kubelet'
+  value: ""
+  type: string
+- name: tls_private_key_file
+  description: 'Location of the corresponding private key file to use to identify the Kubelet'
+  value: ""
+  type: string
