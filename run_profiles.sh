@@ -73,18 +73,18 @@ main() {
 
 while getopts 'c:u:k:z:r:i' c
 do
-	case $c in
-		c) cluster_name="$OPTARG";;
-		u) username="$OPTARG";;
-		k) keyfile="$OPTARG";;
-		z) zone="$OPTARG";;
-		r) region="$OPTARG";;
+  case $c in
+    c) cluster_name="$OPTARG";;
+    u) username="$OPTARG";;
+    k) keyfile="$OPTARG";;
+    z) zone="$OPTARG";;
+    r) region="$OPTARG";;
     i) input_file="$OPTARG";;
-		h|?)
-		  usage
-		  exit 2
-		  ;;
-	esac
+    h|?)
+      usage
+      exit 2
+      ;;
+  esac
 done
 
 main
