@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: inspec-gke-cis-benchmark
+name: inspec-gke-cis-k8s
 title: "InSpec GKE CIS 1.1 Benchmark"
 maintainer: 
 copyright: Google
@@ -21,10 +21,10 @@ license: Apache-2.0
 summary: "Inspec Google Kubernetes Engine Center for Internet Security Benchmark v1.1 Profile"
 version: "0.1.0"
 supports:
-  - platform: k8s
+- platform: k8s
 depends:
-  - name: inspec-k8s
-    url: https://github.com/bgeesaman/inspec-k8s/archive/0.1.2.tar.gz
+- name: inspec-k8s
+  url: https://github.com/bgeesaman/inspec-k8s/archive/0.1.2.tar.gz
 inputs:
 - name: gcp_project_id
   description: 'The GCP project identifier.'
