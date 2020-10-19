@@ -145,7 +145,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kubelet/'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('readOnlyPort') { should cmp 0 }
   end
 end
@@ -171,7 +171,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://github.com/kubernetes/kubernetes/pull/18552'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('streamingConnectionIdleTimeout') { should_not eq 0 }
   end
 end
@@ -200,7 +200,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('protectKernelDefaults') { should cmp 'true' }
   end
 end
@@ -230,7 +230,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('makeIPTablesUtilChains') { should_not cmp 'false' }
   end
 end
@@ -289,7 +289,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/apis/kubeletconfig/v1beta1/types.go'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('eventRecordQPS') { should cmp event_record_qps }
   end
 end
@@ -316,7 +316,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'http://rootsquash.com/2016/05/10/securing-the-kubernetes-api/'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('tlsCertFile') { should cmp tls_cert_file }
     its('tlsPrivateKeyFile') { should cmp tls_private_key_file }
   end
@@ -345,7 +345,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('rotateCertificates') { should_not cmp 'false' }
   end
 end
@@ -373,7 +373,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration'
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
-    subject { yaml(kubelet_config_file_path) }
+    subject { kubelet_config_file }
     its('RotateKubeletServerCertificate') { should cmp 'true' }
   end
 end
