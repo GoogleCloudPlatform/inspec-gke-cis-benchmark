@@ -19,6 +19,7 @@ control_id = '3.2'
 control_abbrev = 'kubelet'
 
 client_ca_file_path = input('client_ca_file_path')
+event_record_qps = input('event_record_qps')
 
 kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
 kubelet_config_file = yaml(kubelet_config_file_path)
@@ -264,6 +265,38 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   describe "[#{gcp_project_id}] This setting is not configurable via the Kubelet config file, this test is Not Applicable." do
     skip "[#{gcp_project_id}] This setting is not configurable via the Kubelet config file."
+  end
+
+end
+
+# 3.2.9
+sub_control_id = "#{control_id}.9"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --event-qps argument is set to 0 or a level which
+  ensures appropriate event capture"
+
+  desc 'Security relevant information should be captured. The --event-qps flag on the Kubelet can
+  be used to limit the rate at which events are gathered. Setting this too low could result in
+  relevant events not being logged, however the unlimited setting of 0 could result in a denial
+  of service on the kubelet.'
+  desc 'rationale', "It is important to capture all events and not restrict event creation. Events are an important
+  source of security information and analytics that ensure that your environment is
+  consistently monitored using the event data."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/apis/kubeletconfig/v1beta1/types.go'
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('eventRecordQPS') { should cmp event_record_qps }
   end
 
 end
