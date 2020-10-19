@@ -238,3 +238,32 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   end
 
 end
+
+# 3.2.8
+sub_control_id = "#{control_id}.8"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'none'
+
+  title "[#{control_abbrev.upcase}] Ensure that the --hostname-override argument is not set"
+
+  desc 'Do not override node hostnames.'
+  desc 'rationale', "Overriding hostnames could potentially break TLS setup between the kubelet and the
+  apiserver. Additionally, with overridden hostnames, it becomes increasingly difficult to
+  associate logs with a particular node and process them for security analytics. Hence, you
+  should setup your kubelet nodes with resolvable FQDNs and avoid overriding the
+  hostnames with IPs."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://github.com/kubernetes/kubernetes/issues/22063'
+
+  describe "[#{gcp_project_id}] This setting is not configurable via the Kubelet config file, this test is Not Applicable." do
+    skip "[#{gcp_project_id}] This setting is not configurable via the Kubelet config file."
+  end
+
+end
