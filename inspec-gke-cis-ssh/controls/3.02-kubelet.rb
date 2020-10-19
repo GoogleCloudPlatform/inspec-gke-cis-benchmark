@@ -47,15 +47,14 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
 
-  anonymous_auth_config = kubelet_config_file.authentication["anonymous"]["enabled"]
+  anonymous_auth_config = kubelet_config_file.authentication['anonymous']['enabled']
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { anonymous_auth_config }
     it 'should have anonymous authentication disabled' do
-      expect(subject).to cmp "false"
+      expect(subject).to cmp 'false'
     end
   end
-
 end
 
 # 3.2.2
@@ -79,15 +78,14 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
 
-  authorization_mode_config = kubelet_config_file.authorization["mode"]
+  authorization_mode_config = kubelet_config_file.authorization['mode']
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { authorization_mode_config }
     it 'should not have authorization mode set to AlwaysAllow' do
-      expect(subject).not_to cmp "AlwaysAllow"
+      expect(subject).not_to cmp 'AlwaysAllow'
     end
   end
-
 end
 
 # 3.2.3
@@ -115,7 +113,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-authentication-authorization/#kubelet-authentication'
 
-  client_ca_file = kubelet_config_file.authentication["x509"]["clientCAFile"]
+  client_ca_file = kubelet_config_file.authentication['x509']['clientCAFile']
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { client_ca_file }
@@ -123,7 +121,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
       expect(subject).to cmp client_ca_file_path
     end
   end
-
 end
 
 # 3.2.4
@@ -151,7 +148,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { yaml(kubelet_config_file_path) }
     its('readOnlyPort') { should cmp 0 }
   end
-
 end
 
 # 3.2.5
@@ -178,7 +174,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { yaml(kubelet_config_file_path) }
     its('streamingConnectionIdleTimeout') { should_not eq 0 }
   end
-
 end
 
 # 3.2.6
@@ -208,7 +203,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { yaml(kubelet_config_file_path) }
     its('protectKernelDefaults') { should cmp 'true' }
   end
-
 end
 
 # 3.2.7
@@ -239,7 +233,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { yaml(kubelet_config_file_path) }
     its('makeIPTablesUtilChains') { should_not cmp 'false' }
   end
-
 end
 
 # 3.2.8
@@ -268,7 +261,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   describe "[#{gcp_project_id}] This setting is not configurable via the Kubelet config file, this test is Not Applicable." do
     skip "[#{gcp_project_id}] This setting is not configurable via the Kubelet config file."
   end
-
 end
 
 # 3.2.9
@@ -300,7 +292,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     subject { yaml(kubelet_config_file_path) }
     its('eventRecordQPS') { should cmp event_record_qps }
   end
-
 end
 
 # 3.2.10
@@ -329,7 +320,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     its('tlsCertFile') { should cmp tls_cert_file }
     its('tlsPrivateKeyFile') { should cmp tls_private_key_file }
   end
-
 end
 
 # 3.2.11
@@ -356,9 +346,8 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { yaml(kubelet_config_file_path) }
-    its('rotateCertificates') { should_not cmp "false" }
+    its('rotateCertificates') { should_not cmp 'false' }
   end
-
 end
 
 # 3.2.12
@@ -385,7 +374,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { yaml(kubelet_config_file_path) }
-    its('RotateKubeletServerCertificate') { should cmp "true" }
+    its('RotateKubeletServerCertificate') { should cmp 'true' }
   end
-
 end

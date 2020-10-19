@@ -48,9 +48,8 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   describe "[#{gcp_project_id}] File permissions of kube-proxy config file #{kube_proxy_config_file_path}" do
     subject { file(kube_proxy_config_file_path) }
-    its('mode') { should be_in [0644, 0640, 0600, 0400, 0444, 0440] }
+    its('mode') { should be_in [0o0644, 0o0640, 0o0600, 0o0400, 0o0444, 0o0440] }
   end
-
 end
 
 # 3.1.2
@@ -83,7 +82,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     its('owner') { should cmp 'root' }
     its('group') { should cmp 'root' }
   end
-
 end
 
 # 3.1.3
@@ -113,9 +111,8 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   describe "[#{gcp_project_id}] File permissions of kubelet config file #{kubelet_config_file_path}" do
     subject { file(kubelet_config_file_path) }
-    its('mode') { should be_in [0644, 0640, 0600, 0400, 0444, 0440] }
+    its('mode') { should be_in [0o0644, 0o0640, 0o0600, 0o0400, 0o0444, 0o0440] }
   end
-
 end
 
 # 3.1.4
@@ -147,5 +144,4 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     its('owner') { should cmp 'root' }
     its('group') { should cmp 'root' }
   end
-
 end
