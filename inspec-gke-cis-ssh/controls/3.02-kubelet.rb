@@ -360,3 +360,32 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   end
 
 end
+
+# 3.2.12
+sub_control_id = "#{control_id}.12"
+control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+  impact 'medium'
+
+  title "[#{control_abbrev.upcase}] Ensure that the RotateKubeletServerCertificate argument is set to true"
+
+  desc 'Enable kubelet server certificate rotation.'
+  desc 'rationale', "RotateKubeletServerCertificate causes the kubelet to both request a serving certificate
+  after bootstrapping its client credentials and rotate the certificate as its existing credentials
+  expire. This automated periodic rotation ensures that the there are no downtimes due to
+  expired certificates and thus addressing availability in the CIA security triad."
+
+  tag cis_scored: true
+  tag cis_level: 1
+  tag cis_gke: sub_control_id.to_s
+  tag cis_version: cis_version.to_s
+  tag project: gcp_project_id.to_s
+
+  ref 'CIS Benchmark', url: cis_url.to_s
+  ref 'GCP Docs', url: 'https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/#kubelet-configuration'
+
+  describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
+    subject { yaml(kubelet_config_file_path) }
+    its('RotateKubeletServerCertificate') { should cmp "true" }
+  end
+
+end
