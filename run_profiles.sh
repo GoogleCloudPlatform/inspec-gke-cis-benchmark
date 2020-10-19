@@ -19,27 +19,33 @@
 # To see usage, execute `run_profiles.sh -h`
 
 usage() {
-	echo "Usage: run_profiles.sh [-BbfePh] -c cluster_name -u username -k keyfile -l location"
-	echo 
-	echo "Runs all InSpec profiles of the GKE CIS benchmark"
-	echo
-	echo "  -c cluster_name         Name of the GKE cluster which will be scanned (required)"
-	echo "  -u username             User which logs in to cluster nodes (required). This user requires root privileges on cluster nodes."
-	echo "  -k keyfile              Path to SSH Keyfile required for user to log in to cluster nodes. (required)"
-	echo "  -z zone                 Zone of zonal GKE cluster. Provide either zone or region."
+  echo "Usage: run_profiles.sh -c cluster_name -u username -k keyfile -z zone -r region -i input_file"
+  echo
+  echo "Runs all InSpec profiles of the GKE CIS benchmark"
+  echo
+  echo "  -c cluster_name         Name of the GKE cluster which will be scanned (required)"
+  echo "  -u username             User which logs in to cluster nodes (required). This user requires root privileges on cluster nodes."
+  echo "  -k keyfile              Path to SSH Keyfile required for user to log in to cluster nodes. (required)"
+  echo "  -z zone                 Zone of zonal GKE cluster. Provide either zone or region."
   echo "  -r region               Region of regional GKE cluster. Provide either zone or region."
+  echo "  -i input file           Path to input file for inspec."
 }
 
 main() {
 
   mkdir -p reports
 
+  if [ -z "$input_file" ];then
+    input_file=inputs.yml
+  fi
+
+
   echo "Running InSpec profile inspec-gke-cis-gcp ..."
-  inspec exec inspec-gke-cis-gcp -t gcp:// --input-file inputs.yml --reporter cli json:reports/inspec-gke-cis-gcp_report.json html:reports/inspec-gke-cis-gcp_report.html
+  inspec exec inspec-gke-cis-gcp -t gcp:// --input-file $input_file --reporter cli json:reports/inspec-gke-cis-gcp_report.json html:reports/inspec-gke-cis-gcp_report.html
   echo "Stored report in reports/inspec-gke-cis-gcp_report."
 
   echo "Running InSpec profile inspec-gke-cis-k8s ..."
-  inspec exec inspec-gke-cis-k8s -t k8s:// --input-file inputs.yml --reporter cli json:reports/inspec-gke-cis-k8s_report.json html:reports/inspec-gke-cis-k8s_report.html
+  inspec exec inspec-gke-cis-k8s -t k8s:// --input-file $input_file --reporter cli json:reports/inspec-gke-cis-k8s_report.json html:reports/inspec-gke-cis-k8s_report.html
   echo "Stored report in reports/inspec-gke-cis-gcp_report."
 
   if [ -z "$region" ];then
@@ -59,25 +65,26 @@ main() {
       proxy_command=`gcloud compute ssh $instance --tunnel-through-iap --dry-run $location_option | sed 's/^.*\(ProxyCommand .* -o ProxyUse\).*$/\1/' | sed 's/\ProxyCommand //g' | sed 's/\ -o ProxyUse//g'`
 
       echo "Running InSpec profile inspec-gke-cis-ssh on node $instance ..."
-      inspec exec inspec-gke-cis-ssh -t ssh://$instance --input-file inputs.yml --proxy_command="$proxy_command" -i $keyfile --user $username --sudo --reporter cli json:reports/inspec-gke-cis-ssh_${instance}_report.json html:reports/inspec-gke-cis-ssh_${instance}_report.html
+      inspec exec inspec-gke-cis-ssh -t ssh://$instance --input-file $input_file --proxy_command="$proxy_command" -i $keyfile --user $username --sudo --reporter cli json:reports/inspec-gke-cis-ssh_${instance}_report.json html:reports/inspec-gke-cis-ssh_${instance}_report.html
       echo "Stored report in reports/inspec-gke-cis-ssh_${instance}_report."
     done
   done
 }
 
-while getopts 'c:u:k:z:r' c
+while getopts 'c:u:k:z:r:i' c
 do
-	case $c in
-		c) cluster_name="$OPTARG";;
-		u) username="$OPTARG";;
-		k) keyfile="$OPTARG";;
-		z) zone="$OPTARG";;
-		r) region="$OPTARG";;
-		h|?)
-		  usage
-		  exit 2
-		  ;;
-	esac
+  case $c in
+    c) cluster_name="$OPTARG";;
+    u) username="$OPTARG";;
+    k) keyfile="$OPTARG";;
+    z) zone="$OPTARG";;
+    r) region="$OPTARG";;
+    i) input_file="$OPTARG";;
+    h|?)
+      usage
+      exit 2
+      ;;
+  esac
 done
 
 main
