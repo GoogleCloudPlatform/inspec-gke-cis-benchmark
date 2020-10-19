@@ -1,6 +1,6 @@
 # GKE CIS 1.1.0 Benchmark Inspec Profile
 
-This repository holds the [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) [Center for Internet Security (CIS)](https://www.cisecurity.org) [version 1.1 Benchmark](https://www.cisecurity.org/benchmark/kubernetes/) [Inspec](https://www.inspec.io/) Profile.
+This repository holds the [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) [Center for Internet Security (CIS)](https://www.cisecurity.org) [version 1.1 Benchmark](https://www.cisecurity.org/benchmark/kubernetes/).
 
 ## Required Disclaimer
 
@@ -8,20 +8,16 @@ This is not an officially supported Google product. This code is intended to hel
 
 ## Coverage
 
-This is an initial release, mainly consisting of ported controls from the CIS for GCP 1.0.0 Benchmark.
+The benchmark contains of three [Inspec](https://www.inspec.io/) profiles which can be found in the subdirectories [inspec-gke-cis-gcp](inspec-gke-cis-gcp), [inspec-gke-cis-k8s](inspec-gke-cis-k8s) and [inspec-gke-cis-ssh](inspec-gke-cis-ssh). The profiles are separated, since each profile needs to run against a different target (`-t`) option when running `inspec exec`. Targets which are used:
+ * inspec-gke-cis-gcp uses [inspec-gcp](https://github.com/inspec/inspec-gcp)
+ * inspec-gke-cis-k8s uses [inspec-k8s](https://github.com/bgeesaman/inspec-k8s)
+ * inspec-gke-cis-ssh uses the SSH protocol for remote access (requires root privileges).
 
-## Usage
+A wrapper script `run_profiles.sh` is provided in the root directory of the repository which executes all profiles sequentially and stores reports in a dedicated folder `/reports`. Note, that you need to configure access via the [Identity-Aware Proxy (IAP)](https://cloud.google.com/iap/docs/enabling-kubernetes-howto) to cluster nodes for this script to run successfully.
 
-### Profile Inputs
-
-* **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
-
-
-### Cloud Shell Walkthrough
-
-Use this Cloud Shell walkthrough for a hands-on example.
-
-[![Open this project in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.png)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark&page=editor&tutorial=walkthrough.md)
+## Prerequisites
+* Configure access via the [Identity-Aware Proxy (IAP)](https://cloud.google.com/iap/docs/enabling-kubernetes-howto) to cluster nodes for the inspec-gke-cis-ssh profile to run successfully
+* Follow the setup steps for inspec-k8s as explained [here](https://github.com/bgeesaman/train-kubernetes#installation)
 
 ### CLI Example
 
@@ -40,12 +36,32 @@ $ gcloud auth application-default login
 ```
 
 ```
-# scan a project with this profile, replace <YOUR_PROJECT_ID> with your project ID
-$ CHEF_LICENSE=accept-no-persist inspec exec https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git -t gcp:// --input gcp_project_id=<YOUR_PROJECT_ID>
-...snip...
-Profile Summary: 48 successful controls, 5 control failures, 7 controls skipped
-Test Summary: 166 successful, 7 failures, 7 skipped
+# Create a file inputs.yml which contains the required and optional inputs to the profiles in the subdirectories
+$ ./run_profiles.sh -c <cluster name> -u <ssh user> -k <keyfile path> -z <cluster zone> -i inputs.yml
 ```
+
+### Profile Inputs (combined across all profiles)
+
+* **gcp_project_id** - (Default: "", type: string) - The target GCP Project that must be specified.
+* **gcp_gke_locations** - (Default: "", type: array) - The list of regions and/or zone names where GKE clusters are running. An empty array searches all locations
+* **gce_zones** - (Default: "", type: array) - The list of zone names where GCE instances are running. An empty array searches all locations.
+* **registry_storage_admin_list** - (Default: "", type: array) - The allowed list of Storage Admins on Registry image bucket
+* **registry_storage_object_admin_list** - (Default: "", type: array) - The allowed list of Storage Object Admins on Registry image bucket
+* **registry_storage_object_creator_list** - (Default: "", type: array) - The allowed list of Storage Object Admins on Registry image bucket
+* **registry_storage_object_creator_list** - (Default: "", type: array) - The allowed list of Storage Object Creators on Registry image bucket
+* **registry_storage_legacy_bucket_owner_list** - (Default: "", type: array) - The allowed list of Storage Legacy Bucket Owners on Registry image bucket
+* **registry_storage_legacy_bucket_writer_list** - (Default: "", type: array) - The allowed list of Storage Legacy Bucket Writers on Registry image bucket
+* **registry_storage_legacy_object_owner_list** - (Default: "", type: array) - The allowed list of Storage Legacy Object Owners on Registry image bucket
+* **client_ca_file_path** - (Default: "/etc/srv/kubernetes/pki/ca-certificates.crt", type: string) - Path to the client ca file used in Kubelet config
+* **event_record_qps** - (Default: "0", type: string) - --event-qps flag of Kubelet config (see control 3.2.9)
+* **tls_cert_file** - (Default: "", type: string) - Location of the certificate file to use to identify the Kubelet
+* **tls_private_key_file** - (Default: "", type: string) - Location of the corresponding private key file to use to identify the Kubelet
+
+### Cloud Shell Walkthrough
+
+Use this Cloud Shell walkthrough for a hands-on example.
+
+[![Open this project in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.png)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark&page=editor&tutorial=walkthrough.md)
 
 ### Required Permissions
 
