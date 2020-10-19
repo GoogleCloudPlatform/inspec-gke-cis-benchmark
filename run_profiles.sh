@@ -32,12 +32,6 @@ usage() {
 
 main() {
 
-  echo $cluster_name
-  echo $username
-  echo $keyfile
-  echo $zone
-  echo $region
-
   mkdir -p reports
 
   echo "Running InSpec profile inspec-gke-cis-gcp ..."
