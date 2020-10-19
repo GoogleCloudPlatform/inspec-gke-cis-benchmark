@@ -18,6 +18,10 @@ cis_url = input('cis_url')
 control_id = '3.1'
 control_abbrev = 'worker-node-configuration-files'
 
+c = command('ps -ef | grep kube-proxy | grep -e "--kubeconfig=" | sed "s/^.*\(--kubeconfig=.* \).*$/\1/" | awk \'{print $1}\'').stdout.split('=')
+kube_proxy_config_file_path = c[1].split("\n").first
+kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
+
 # 3.1.1
 sub_control_id = "#{control_id}.1"
 control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
@@ -42,9 +46,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kube-proxy/'
-
-  c = command('ps -ef | grep kube-proxy | grep -e "--kubeconfig=" | sed "s/^.*\(--kubeconfig=.* \).*$/\1/" | awk \'{print $1}\'').stdout.split('=')
-  kube_proxy_config_file_path = c[1].split("\n").first
 
   describe "[#{gcp_project_id}] File permissions of kube-proxy config file #{kube_proxy_config_file_path}" do
     subject { file(kube_proxy_config_file_path) }
@@ -73,9 +74,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/admin/kube-proxy/'
-
-  c = command('ps -ef | grep kube-proxy | grep -e "--kubeconfig=" | sed "s/^.*\(--kubeconfig=.* \).*$/\1/" | awk \'{print $1}\'').stdout.split('=')
-  kube_proxy_config_file_path = c[1].split("\n").first
 
   describe "[#{gcp_project_id}] Kube-proxy config file #{kube_proxy_config_file_path}" do
     subject { file(kube_proxy_config_file_path) }
@@ -107,8 +105,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/'
 
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
-
   describe "[#{gcp_project_id}] File permissions of kubelet config file #{kubelet_config_file_path}" do
     subject { file(kubelet_config_file_path) }
     its('mode') { should be_in [0o0644, 0o0640, 0o0600, 0o0400, 0o0444, 0o0440] }
@@ -136,8 +132,6 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/'
-
-  kubelet_config_file_path = command('ps -ef | grep kubelet | grep -e "--config " | sed "s/^.*\(--config .* \).*$/\1/"  | awk \'{print $2}\'').stdout.split("\n").first
 
   describe "[#{gcp_project_id}] Kubelet config file #{kubelet_config_file_path}" do
     subject { file(kubelet_config_file_path) }
