@@ -53,20 +53,26 @@ main() {
   else
     location_option="--region $region"
   fi
-  instance_group_urls=`gcloud container node-pools describe default-pool --cluster inspec-cluster $location_option --format json | jq .instanceGroupUrls | jq @sh`
 
-  for i in "${instance_group_urls[@]}"
+  # to run InSpec on all cluster nodes, get all node pools of the cluster and get all instances that are part of the associated instance group
+  node_pools=`gcloud container clusters describe inspec-cluster --zone us-central1-c --format json | jq .nodePools[].name | tr -d \'\"`
+  for node_pool in $node_pools
   do
-    instance_group_uri=`echo $i | tr -d \'\"`
-    instance_uri_list=`gcloud compute instance-groups managed list-instances --uri $instance_group_uri`
-    for instance in $instance_uri_list
-    do
-      instance=`echo $instance | sed 's/^.*instances\///'`
-      proxy_command=`gcloud compute ssh $instance --tunnel-through-iap --dry-run $location_option | sed 's/^.*\(ProxyCommand .* -o ProxyUse\).*$/\1/' | sed 's/\ProxyCommand //g' | sed 's/\ -o ProxyUse//g'`
+    instance_group_urls=`gcloud container node-pools describe $node_pool --cluster inspec-cluster $location_option --format json | jq .instanceGroupUrls | jq @sh`
 
-      echo "Running InSpec profile inspec-gke-cis-ssh on node $instance ..."
-      inspec exec inspec-gke-cis-ssh -t ssh://$instance --input-file $input_file --proxy_command="$proxy_command" -i $keyfile --user $username --sudo --reporter cli json:reports/inspec-gke-cis-ssh_${instance}_report.json html:reports/inspec-gke-cis-ssh_${instance}_report.html
-      echo "Stored report in reports/inspec-gke-cis-ssh_${instance}_report."
+    for i in "${instance_group_urls[@]}"
+    do
+      instance_group_uri=`echo $i | tr -d \'\"`
+      instance_uri_list=`gcloud compute instance-groups managed list-instances --uri $instance_group_uri`
+      for instance in $instance_uri_list
+      do
+        instance=`echo $instance | sed 's/^.*instances\///'`
+        proxy_command=`gcloud compute ssh $instance --tunnel-through-iap --dry-run $location_option | sed 's/^.*\(ProxyCommand .* -o ProxyUse\).*$/\1/' | sed 's/\ProxyCommand //g' | sed 's/\ -o ProxyUse//g'`
+
+        echo "Running InSpec profile inspec-gke-cis-ssh on node $instance ..."
+        inspec exec inspec-gke-cis-ssh -t ssh://$instance --input-file $input_file --proxy_command="$proxy_command" -i $keyfile --user $username --sudo --reporter cli json:reports/inspec-gke-cis-ssh_${instance}_report.json html:reports/inspec-gke-cis-ssh_${instance}_report.html
+        echo "Stored report in reports/inspec-gke-cis-ssh_${instance}_report."
+      done
     done
   done
 }
