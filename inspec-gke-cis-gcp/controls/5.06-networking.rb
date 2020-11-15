@@ -33,6 +33,36 @@ if gke_clusters.nil? || gke_clusters.count.zero?
   end
 else
 
+  # 5.6.1
+  sub_control_id = "#{control_id}.1"
+  control "cis-gke-#{control_id}-#{control_abbrev}" do
+    impact 'low'
+
+    title "[#{control_abbrev.upcase}] Enable VPC Flow Logs and Intranode Visibility"
+
+    desc "Enable VPC Flow Logs and Intranode Visibility to see pod-level traffic, even for traffic
+    within a worker node."
+    desc 'rationale', "Enabling Intranode Visibility makes your intranode pod to pod traffic visible to the
+    networking fabric. With this feature, you can use VPC Flow Logs or other VPC features for
+    intranode traffic."
+
+    tag cis_scored: true
+    tag cis_level: 1
+    tag cis_gke: sub_control_id.to_s
+    tag cis_version: cis_version.to_s
+    tag project: gcp_project_id.to_s
+
+    ref 'CIS Benchmark', url: cis_url.to_s
+    ref 'GCP Docs', url: 'https://cloud.google.com/kubernetes-engine/docs/how-to/intranode-visibility'
+
+    gke_clusters.each do |gke_cluster|
+      describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
+        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
+        its('network_config.enable_intra_node_visibility') { should cmp true }
+      end
+    end
+  end
+
   # 5.6.2
   sub_control_id = "#{control_id}.2"
   control "cis-gke-#{control_id}-#{control_abbrev}" do

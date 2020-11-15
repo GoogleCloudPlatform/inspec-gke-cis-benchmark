@@ -74,4 +74,40 @@ else
       end
     end
   end
+
+  # 5.4.2
+  sub_control_id = "#{control_id}.2"
+  control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+    impact 'medium'
+
+    title "[#{control_abbrev.upcase}] Ensure the GKE Metadata Server is Enabled"
+
+    desc "Running the GKE Metadata Server prevents workloads from accessing sensitive instance
+    metadata and facilitates Workload Identity"
+    desc 'rationale', "Every node stores its metadata on a metadata server. Some of this metadata, such as
+    kubelet credentials and the VM instance identity token, is sensitive and should not be
+    exposed to a Kubernetes workload. Enabling the GKE Metadata server prevents pods (that
+    are not running on the host network) from accessing this metadata and facilitates
+    Workload Identity.
+    When unspecified, the default setting allows running pods to have full access to the node's
+    underlying metadata server."
+
+    tag cis_scored: true
+    tag cis_level: 1
+    tag cis_gke: sub_control_id.to_s
+    tag cis_version: cis_version.to_s
+    tag project: gcp_project_id.to_s
+
+    ref 'CIS Benchmark', url: cis_url.to_s
+    ref 'GCP Docs', url: 'https://cloud.google.com/kubernetes-engine/docs/how-to/protecting-cluster-metadata#concealment'
+
+    gke_clusters.each do |gke_cluster|
+      google_container_node_pools(project: gcp_project_id, location: gke_cluster[:location], cluster_name: gke_cluster[:cluster_name]).node_pool_names.each do |nodepoolname|
+        describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}, Node Pool: #{nodepoolname}" do
+          subject { google_container_node_pool(project: gcp_project_id, location: gke_cluster[:location], cluster_name: gke_cluster[:cluster_name], nodepool_name: nodepoolname) }
+          its('config.workload_meta_config.mode') { should be_in %w[GCE_METADATA GKE_METADATA] }
+        end
+      end
+    end
+  end
 end
