@@ -52,13 +52,44 @@ else
     tag project: gcp_project_id.to_s
 
     ref 'CIS Benchmark', url: cis_url.to_s
-    ref 'GCP Docs', url: 'https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your- cluster#disable_kubernetes_dashboard'
+    ref 'GCP Docs', url: 'https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster#disable_kubernetes_dashboard'
 
     gke_clusters.each do |gke_cluster|
       describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
         subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
         # TODO: Inspec-GCP support needed
         its('addons_config.kubernetes_dashboard.disabled') { should cmp true }
+      end
+    end
+  end
+
+  # 5.10.2
+  sub_control_id = "#{control_id}.2"
+  control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
+    impact 'medium'
+
+    title "[#{control_abbrev.upcase}] Ensure that Alpha clusters are not used for production workloads"
+
+    desc 'Alpha clusters are not covered by an SLA and are not production-ready.'
+    desc 'rationale', "Alpha clusters are designed for early adopters to experiment with workloads that take
+    advantage of new features before those features are production-ready. They have all
+    Kubernetes API features enabled, but are not covered by the GKE SLA, do not receive
+    security updates, have node auto-upgrade and node auto-repair disabled, and cannot be
+    upgraded. They are also automatically deleted after 30 days."
+
+    tag cis_scored: true
+    tag cis_level: 1
+    tag cis_gke: sub_control_id.to_s
+    tag cis_version: cis_version.to_s
+    tag project: gcp_project_id.to_s
+
+    ref 'CIS Benchmark', url: cis_url.to_s
+    ref 'GCP Docs', url: 'https://cloud.google.com/kubernetes-engine/docs/concepts/alpha-clusters'
+
+    gke_clusters.each do |gke_cluster|
+      describe "[#{gcp_project_id}] Cluster #{gke_cluster[:location]}/#{gke_cluster[:cluster_name]}" do
+        subject { google_container_cluster(project: gcp_project_id, location: gke_cluster[:location], name: gke_cluster[:cluster_name]) }
+        its('enable_kubernetes_alpha') { should eq nil }
       end
     end
   end
