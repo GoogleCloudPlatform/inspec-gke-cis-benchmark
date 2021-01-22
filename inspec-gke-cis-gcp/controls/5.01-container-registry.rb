@@ -188,7 +188,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
 
   title "[#{control_abbrev.upcase}] Minimize Container Registries to only those approved"
 
-  desc 'Use Binary Authorization to allowlist (whitelist) only approved container registries.'
+  desc 'Use Binary Authorization to allowlist only approved container registries.'
   desc 'rationale', "Allowing unrestricted access to external container registries provides the opportunity for
   malicious or unapproved containers to be deployed into the cluster. Allowlisting only
   approved container registries reduces this risk.
