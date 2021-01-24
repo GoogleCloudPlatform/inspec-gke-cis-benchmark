@@ -31,8 +31,12 @@ steps:
   args: 
     - '-c'
     - |
-      inspec vendor /share/.
-      inspec check /share/.
+      inspec vendor /share/inspec-gke-cis-gcp/.
+      inspec vendor /share/inspec-gke-cis-k8s/.
+      inspec vendor /share/inspec-gke-cis-ssh/.
+      inspec check /share/inspec-gke-cis-gcp/.
+      inspec check /share/inspec-gke-cis-k8s/.
+      inspec check /share/inspec-gke-cis-ssh/.
 
 - id: 'Rubocop'
   waitFor: ['Verify InSpec controls']
@@ -41,7 +45,9 @@ steps:
   args: 
     - '-c'
     - |
-      rubocop /share/.
+      rubocop /share/inspec-gke-cis-gcp/.
+      rubocop /share/inspec-gke-cis-k8s/.
+      rubocop /share/inspec-gke-cis-ssh/.
 
 - id: 'Write input file'
   waitFor: ['Rubocop']
@@ -78,7 +84,7 @@ steps:
   args: 
     - '-c'
     - |
-      inspec exec /share/. -t gcp:// \
+      inspec exec /share/inspec-gke-cis-gcp/. -t gcp:// \
       --input-file /workspace/inputs.yml \
       --reporter cli json:/workspace/cis_report.json html:/workspace/cis_report.html | tee out.json
 
