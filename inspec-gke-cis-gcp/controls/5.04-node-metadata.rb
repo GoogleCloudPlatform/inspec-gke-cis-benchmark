@@ -93,7 +93,7 @@ else
     underlying metadata server."
 
     tag cis_scored: true
-    tag cis_level: 1
+    tag cis_level: 2
     tag cis_gke: sub_control_id.to_s
     tag cis_version: cis_version.to_s
     tag project: gcp_project_id.to_s

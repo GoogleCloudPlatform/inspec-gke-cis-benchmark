@@ -47,7 +47,7 @@ else
     intranode traffic."
 
     tag cis_scored: true
-    tag cis_level: 1
+    tag cis_level: 2
     tag cis_gke: sub_control_id.to_s
     tag cis_version: cis_version.to_s
     tag project: gcp_project_id.to_s
@@ -145,7 +145,7 @@ else
   Although Kubernetes API requires an authorized token to perform sensitive actions, a vulnerability could potentially expose the Kubernetes publically with unrestricted access. Additionally, an attacker may be able to identify the current cluster and Kubernetes API version and determine whether it is vulnerable to an attack. Unless required, disabling public endpoint will help prevent such threats, and require the attacker to be on the master's VPC network to perform any attack on the Kubernetes API."
 
     tag cis_scored: true
-    tag cis_level: 1
+    tag cis_level: 2
     tag cis_gke: sub_control_id.to_s
     tag cis_version: cis_version.to_s
     tag project: gcp_project_id.to_s

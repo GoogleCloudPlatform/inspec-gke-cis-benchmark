@@ -274,7 +274,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   given permission to access that PSP."
 
   tag cis_scored: true
-  tag cis_level: 1
+  tag cis_level: 2
   tag cis_gke: sub_control_id.to_s
   tag cis_version: cis_version.to_s
   tag project: gcp_project_id.to_s
@@ -428,7 +428,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   minimized."
 
   tag cis_scored: false
-  tag cis_level: 1
+  tag cis_level: 2
   tag cis_gke: sub_control_id.to_s
   tag cis_version: cis_version.to_s
   tag project: gcp_project_id.to_s
