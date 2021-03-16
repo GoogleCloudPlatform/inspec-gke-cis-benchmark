@@ -18,8 +18,8 @@ gcp_project_id = input('gcp_project_id')
 gcp_gke_locations = input('gcp_gke_locations')
 cis_version = input('cis_version')
 cis_url = input('cis_url')
-control_id = '5.3'
-control_abbrev = 'networking'
+control_id = '6.3'
+control_abbrev = 'kms'
 
 gke_clusters = GKECache(project: gcp_project_id, gke_locations: gcp_gke_locations).gke_clusters_cache
 
@@ -33,7 +33,7 @@ if gke_clusters.nil? || gke_clusters.count.zero?
   end
 else
 
-  # 5.3.1
+  # 6.3.1
   sub_control_id = "#{control_id}.1"
   control "cis-gke-#{control_id}-#{control_abbrev}" do
     impact 'medium'
