@@ -18,7 +18,8 @@ cis_url = input('cis_url')
 control_id = '4.2'
 control_abbrev = 'pod-security-policies'
 
-pod_security_policies = k8sobjects(api: 'extensions/v1beta1', type: 'podsecuritypolicies').items
+pod_security_policies_api = 'policy/v1beta1'
+pod_security_policies = k8sobjects(api: pod_security_policies_api, type: 'podsecuritypolicies').items
 
 # 4.2.1
 sub_control_id = "#{control_id}.1"
@@ -55,7 +56,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_non_privileged_policy = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       has_non_privileged_policy = true if pod_security_policy.item.spec.privileged != true
     end
     describe "[#{gcp_project_id}] Pod Security Policies" do
@@ -102,7 +103,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_host_pid_disabled = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       has_host_pid_disabled = true if pod_security_policy.item.spec.hostPID != true
     end
     describe "[#{gcp_project_id}] Pod Security Policies" do
@@ -148,7 +149,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_host_ipc_disabled = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       has_host_ipc_disabled = true if pod_security_policy.item.spec.hostIPC != true
     end
     describe "[#{gcp_project_id}] Pod Security Policies" do
@@ -194,7 +195,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_host_network_disabled = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       has_host_network_disabled = true if pod_security_policy.item.spec.hostNetwork != true
     end
     describe "[#{gcp_project_id}] Pod Security Policies" do
@@ -243,7 +244,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_privilege_escalation_disabled = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       has_privilege_escalation_disabled = true if pod_security_policy.item.spec.allowPrivilegeEscalation != true
     end
     describe "[#{gcp_project_id}] Pod Security Policies" do
@@ -292,7 +293,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
     has_root_user_disabled = true
     pod_security_policies.each do |pod_security_policy_item|
       has_root_user_disabled = true
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       if pod_security_policy.item.spec.runAsUser.rule == 'MustRunAs'
         pod_security_policy.item.spec.runAsUser.ranges.each do |range|
           has_root_user_disabled = false if range.min.zero?
@@ -349,7 +350,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_req_capabilities_dropped = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       next if pod_security_policy.item.spec.requiredDropCapabilities.nil?
       has_req_capabilities_dropped = true if pod_security_policy.item.spec.requiredDropCapabilities.include? 'ALL'
       has_req_capabilities_dropped = true if pod_security_policy.item.spec.requiredDropCapabilities.include? 'NET_RAW'
@@ -397,7 +398,7 @@ control "cis-gke-#{sub_control_id}-#{control_abbrev}" do
   else
     has_added_capabilities = false
     pod_security_policies.each do |pod_security_policy_item|
-      pod_security_policy = k8sobject(api: 'extensions/v1beta1', type: 'podsecuritypolicies', name: pod_security_policy_item.name)
+      pod_security_policy = k8sobject(api: pod_security_policies_api, type: 'podsecuritypolicies', name: pod_security_policy_item.name)
       next if pod_security_policy.item.spec.allowedCapabilities.nil?
       if pod_security_policy.item.spec.allowedCapabilities.count.positive?
         has_added_capabilities = true
