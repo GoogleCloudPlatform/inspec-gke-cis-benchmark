@@ -19,11 +19,24 @@ A wrapper script `run_profiles.sh` is provided in the root directory of the repo
 * Configure access via the [Identity-Aware Proxy (IAP)](https://cloud.google.com/iap/docs/enabling-kubernetes-howto) to cluster nodes for the inspec-gke-cis-ssh profile to run successfully
 * Follow the setup steps for inspec-k8s as explained [here](https://github.com/bgeesaman/train-kubernetes#installation)
 
-### CLI Example
+### CLI Example (Cloud Shell)
 
 ```
-#install inspec
-$ gem install inspec-bin --no-document --quiet
+# install inspec
+$ curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+
+# install inspec-k8s (refer to the inspec-k8s docs for details and troubleshooting)
+$ gem install train-kubernetes
+$ inspec plugin install train-kubernetes
+
+# Add the host you are running from to the master-authorized-networks to allow access to Private K8S Clusters
+gcloud container clusters update inspec-demo \
+  --zone us-central1-c \
+  --enable-master-authorized-networks \
+  --master-authorized-networks <your host's IP address>/32
+
+# clone the Git Repo
+$ git clone https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git
 ```
 
 ```
