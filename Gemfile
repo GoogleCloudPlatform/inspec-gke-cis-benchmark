@@ -15,3 +15,8 @@
 source 'https://rubygems.org'
 
 gem 'inspec', '>= 3', '< 5'
+gem 'train-kubernetes', '~> 0.1.6'
+gem 'yajl-ruby', '~> 1.4.1'
+gem 'recursive-open-struct', '~> 1.1.3'
+gem 'ed25519', '~> 1.2.4'
+gem 'bcrypt_pbkdf', '~> 1.1.0'
