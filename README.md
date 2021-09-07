@@ -22,21 +22,41 @@ A wrapper script `run_profiles.sh` is provided in the root directory of the repo
 ### CLI Example (Cloud Shell)
 
 ```
-# install inspec
-$ curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
-
-# install inspec-k8s (refer to the inspec-k8s docs for details and troubleshooting)
-$ gem install train-kubernetes
-$ inspec plugin install train-kubernetes
-
-# Add the host you are running from to the master-authorized-networks to allow access to Private K8S Clusters
-gcloud container clusters update inspec-demo \
-  --zone us-central1-c \
-  --enable-master-authorized-networks \
-  --master-authorized-networks <your host's IP address>/32
+# install inspec (later version might work but not tested)
+$ gem install inspec-bin -v 4.41.2 --no-document --quiet
 
 # clone the Git Repo
 $ git clone https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark.git
+$ cd inspec-gke-cis-benchmark
+
+# Write an inputs file, see basic example below
+$ cat <<EOF > inputs.yml
+gcp_project_id: "<YOUR PROJECT ID>"
+gcp_gke_locations:
+ - 'us-central1-c'
+gce_zones:
+ - 'us-central1'
+ - 'us-central1-c'
+EOF
+
+# Connect to GKE Cluster (getting credentials in ~/.kubeconfig, validate using kubectl)
+$ gcloud container clusters get-credentials <cluster name> \
+  --zone <zone> --project <YOUR PROJECT ID>
+
+# install inspec-k8s and relevant gems (needs to run in directory of Gemfile)
+# (refer to the inspec-k8s docs for details and troubleshooting)
+$ bundle install
+
+# install InSpec plugin train-kubernetes
+$ inspec plugin install train-kubernetes
+
+# Add the host you are running from to the master-authorized-networks to allow access to Private K8S Clusters
+$ gcloud container clusters update <cluster name> \
+  --zone <zone> \
+  --enable-master-authorized-networks \
+  --master-authorized-networks <your host's IP address>/32
+
+
 ```
 
 ```
